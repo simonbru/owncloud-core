@@ -179,4 +179,11 @@ interface Node extends FileInfo {
 	 * @return string
 	 */
 	public function getName();
+
+	/**
+	 * Get the root folder of the filesystem
+	 *
+	 * @return \OCP\Files\Folder
+	 */
+	public function getRoot();
 }
