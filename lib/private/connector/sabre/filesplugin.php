@@ -1,6 +1,7 @@
 <?php
 namespace OC\Connector\Sabre;
 
+use Sabre\DAV\IFile;
 use \Sabre\DAV\PropFind;
 use \Sabre\DAV\PropPatch;
 use \Sabre\HTTP\RequestInterface;
@@ -29,6 +30,9 @@ class FilesPlugin extends \Sabre\DAV\ServerPlugin {
 	 */
 	private $tree;
 
+	/**
+	 * @param \Sabre\DAV\Tree $tree
+	 */
 	public function __construct(\Sabre\DAV\Tree $tree) {
 		$this->tree = $tree;
 	}
@@ -62,6 +66,21 @@ class FilesPlugin extends \Sabre\DAV\ServerPlugin {
 		$this->server->on('afterBind', array($this, 'sendFileIdHeader'));
 		$this->server->on('afterWriteContent', array($this, 'sendFileIdHeader'));
 		$this->server->on('beforeMethod:GET', array($this, 'handleRangeHeaders'));
+		$this->server->on('afterMethod:GET', [$this,'httpGet']);
+	}
+
+	/**
+	 * Plugin that adds a 'Content-Disposition: attachment' header to all files
+	 * delivered by SabreDAV.
+	 * @param RequestInterface $request
+	 * @param ResponseInterface $response
+	 */
+	function httpGet(RequestInterface $request, ResponseInterface $response) {
+		// Only handle valid files
+		$node = $this->tree->getNodeForPath($request->getPath(), 0);
+		if (!($node instanceof IFile)) return;
+
+		$response->addHeader('Content-Disposition', 'attachment');
 	}
 
 	/**
