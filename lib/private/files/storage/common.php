@@ -463,7 +463,7 @@ abstract class Common implements \OC\Files\Storage\Storage {
 			$dh = $sourceStorage->opendir($sourceInternalPath);
 			$result = $this->mkdir($targetInternalPath);
 			if (is_resource($dh)) {
-				while (($file = readdir($dh)) !== false) {
+				while ($result and ($file = readdir($dh)) !== false) {
 					if (!Filesystem::isIgnoredDir($file)) {
 						$result &= $this->copyFromStorage($sourceStorage, $sourceInternalPath . '/' . $file, $targetInternalPath . '/' . $file);
 					}
@@ -473,13 +473,20 @@ abstract class Common implements \OC\Files\Storage\Storage {
 			$source = $sourceStorage->fopen($sourceInternalPath, 'r');
 			$target = $this->fopen($targetInternalPath, 'w');
 			list(, $result) = \OC_Helper::streamCopy($source, $target);
-			if ($preserveMtime) {
+			if ($result and $preserveMtime) {
 				$this->touch($targetInternalPath, $sourceStorage->filemtime($sourceInternalPath));
 			}
 			fclose($source);
 			fclose($target);
+
+			if (!$result) {
+				// delete partially written target file
+				$this->unlink($targetInternalPath);
+				// delete cache entry that was created by fopen
+				$this->getCache()->remove($targetInternalPath);
+			}
 		}
-		return $result;
+		return (bool)$result;
 	}
 
 	/**
