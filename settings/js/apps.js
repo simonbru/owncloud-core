@@ -365,6 +365,11 @@ OC.Settings.Apps = OC.Settings.Apps || {
 			OC.Settings.Apps.loadCategory(categoryId);
 		});
 
+		$(document).on('click', '.app-description-toggle', function () {
+			$(this).addClass('hidden');
+			$(this).siblings('.app-description-container').slideDown();
+		});
+
 		$(document).on('click', '#apps-list input.enable', function () {
 			var appId = $(this).data('appid');
 			var element = $(this);

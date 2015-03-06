@@ -194,6 +194,17 @@ span.version { margin-left:1em; margin-right:1em; color:#555; }
 .recommendedapp {
 	display: inline-block;
 }
+
+.app-description-toggle,
+.app-description-container {
+	display: block;
+	clear: both;
+	padding: 7px 0;
+}
+.hidden {
+	display: none;
+}
+
 .app-description {
 	clear: both;
 }
