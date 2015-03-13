@@ -77,15 +77,17 @@ class Scan extends Command {
 
 	protected function execute(InputInterface $input, OutputInterface $output) {
 		$path = $input->getOption('path');
-		if ($path) {
-			$path = '/'.trim($path, '/');
-			list (, $user, ) = explode('/', $path, 3);
-			$users = array($user);
-		} else if ($input->getOption('all')) {
-			$users = $this->userManager->search('');
-		} else {
-			$users = $input->getArgument('user_id');
+		$users = $input->getArgument('user_id');
+		if (!$users) {
+			if ($input->getOption('all')) {
+				$users = $this->userManager->search('');
+			} else if ($path) {
+				$path = '/'.trim($path, '/');
+				list (, $user, ) = explode('/', $path, 3);
+				$users = array($user);
+			}
 		}
+
 		$quiet = $input->getOption('quiet');
 
 
